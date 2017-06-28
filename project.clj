@@ -1,4 +1,4 @@
-(defproject io.bfpcorporation/excel "0.2.4"
+(defproject io.bfpcorporation/excel "0.2.5-SNAPSHOT"
   :description "A thin Clojure wrapper around a small part of Apache POI for
                 reading .xlsx files."
   :url "http://github.com/csm/excel"
