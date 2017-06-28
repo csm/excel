@@ -9,12 +9,16 @@
 
 ;; The function definitions progress from handling cells to rows, to sheets,
 ;; to workbooks.
-(ns ontodev.excel
+(ns io.bfpcorporation.excel
   (:require [clojure.tools.logging :as log]
             [clojure.string :as string]
             [clojure.java.io :as io])
   (:import
-    (org.apache.poi.ss.usermodel Cell Row Sheet Workbook WorkbookFactory)))
+    (org.apache.poi.ss.usermodel Cell Row Sheet Workbook WorkbookFactory DataFormatter)
+    [org.apache.poi.hssf.usermodel HSSFWorkbook HSSFFormulaEvaluator]
+    [org.apache.poi.xssf.streaming SXSSFWorkbook SXSSFFormulaEvaluator]
+    [org.apache.poi.xssf.usermodel XSSFWorkbook XSSFFormulaEvaluator]
+    [java.util Locale]))
 
 ;; ## Cells
 ;; I've found it hard to trust the Cell Type and Cell Style for data such as
@@ -26,14 +30,14 @@
 ;; additional step.
 
 (defn get-cell-string-value
-  "Get the value of a cell as a string, by changing the cell type to 'string'
-   and then changing it back."
+  "Get the value of a cell as a string."
   [cell]
-  (let [ct    (.getCellType cell)
-        _     (.setCellType cell Cell/CELL_TYPE_STRING)
-        value (.getStringCellValue cell)]
-    (.setCellType cell ct)
-    value))
+  (.formatCellValue (DataFormatter. Locale/ROOT)
+                    cell (let [wb (-> cell (.getSheet) (.getWorkbook))]
+                           (condp instance? wb
+                             HSSFWorkbook (HSSFFormulaEvaluator. wb)
+                             SXSSFWorkbook (SXSSFFormulaEvaluator. wb)
+                             XSSFWorkbook (XSSFFormulaEvaluator. wb)))))
 
 ;; ## Rows
 ;; Rows are made up of cells. We consider the first row to be a header, and
