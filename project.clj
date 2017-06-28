@@ -11,4 +11,13 @@
   {:dev {:dependencies [[midje "1.6.3"]
                         [lazytest "1.2.3"]]
          :plugins [[lein-midje "3.1.3"]
-                   [lein-marginalia "0.7.1"]]}})
+                   [lein-marginalia "0.7.1"]]}}
+  :release-tasks [["vcs" "assert-committed"]
+                  ["change" "version"
+                   "leiningen.release/bump-version" "release"]
+                  ["vcs" "commit"]
+                  ["vcs" "tag"]
+                  ["deploy" "clojars"]
+                  ["change" "version" "leiningen.release/bump-version"]
+                  ["vcs" "commit"]
+                  ["vcs" "push"]])
